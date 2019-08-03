@@ -30,31 +30,31 @@ struct Point {
 };
 
 // definitions of the methods + ctor and dtor
-int get_x(struct IPoint *_self)
+static int get_x(struct IPoint *_self)
 {
 	struct Point *self = (void *)_self - sizeof(struct RPoint);
 	return self->representation.x;
 }
 
-int get_y(struct IPoint *_self)
+static int get_y(struct IPoint *_self)
 {
 	struct RPoint *self = (void *)_self - sizeof(struct RPoint);
 	return self->y;
 }
 
-void set_x(struct IPoint *_self, int x)
+static void set_x(struct IPoint *_self, int x)
 {
 	struct RPoint *self = (void *)_self - sizeof(struct RPoint);
 	self->x = x;
 }
 
-void set_y(struct IPoint *_self, int y)
+static void set_y(struct IPoint *_self, int y)
 {
 	struct RPoint *self = (void *)_self - sizeof(struct RPoint);
 	self->y = y;
 }
 
-void print(struct IPoint *_self)
+static void print(struct IPoint *_self)
 {
 	struct RPoint *self = (void *)_self - sizeof(struct RPoint);
 	fprintf(stdout, self->cls->prnt, self->x, self->y);
@@ -63,7 +63,7 @@ void print(struct IPoint *_self)
 /*\
  * Where you build the object struct
 \*/
-void *point_ctor(void *_self, va_list *ap)
+static void *point_ctor(void *_self, va_list *ap)
 {
 	struct Point *self = _self;
 
@@ -82,7 +82,7 @@ void *point_ctor(void *_self, va_list *ap)
 	return &self->interface;
 }
 
-void *point_dtor(void *_self)
+static void *point_dtor(void *_self)
 {	// return original address passed to the ctor
 	// do any other cleanup you might need to do
 	return _self - sizeof(struct RPoint);
