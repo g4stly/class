@@ -15,49 +15,50 @@ struct PointCls {
  * this struct holds instance variables and data
  * it must end with a pointer to the class definition
 \*/
-struct RPoint {
+struct R_Point {
 	int x, y;			// instance variables
-	const struct PointCls *cls;	// class definition
 };
 
 /*\
  * What I call the "Object Struct"
  * where everything connects
 \*/
-struct Point {
-	struct RPoint representation;
-	struct IPoint interface;
+struct _Point {
+	struct R_Point representation;	// representation
+	const struct PointCls *cls;	// class definition
+	struct Point interface;		// interface
 };
 
 // definitions of the methods + ctor and dtor
-static int get_x(struct IPoint *_self)
+static int get_x(struct Point *_self)
 {
-	struct Point *self = (void *)_self - sizeof(struct RPoint);
+	struct _Point *self = GET_OBJ(_self, struct R_Point);
 	return self->representation.x;
 }
 
-static int get_y(struct IPoint *_self)
+static int get_y(struct Point *_self)
 {
-	struct RPoint *self = (void *)_self - sizeof(struct RPoint);
+	struct R_Point *self = GET_OBJ(_self, struct R_Point);
 	return self->y;
 }
 
-static void set_x(struct IPoint *_self, int x)
+static void set_x(struct Point *_self, int x)
 {
-	struct RPoint *self = (void *)_self - sizeof(struct RPoint);
+	struct R_Point *self = GET_OBJ(_self, struct R_Point);
 	self->x = x;
 }
 
-static void set_y(struct IPoint *_self, int y)
+static void set_y(struct Point *_self, int y)
 {
-	struct RPoint *self = (void *)_self - sizeof(struct RPoint);
+	struct R_Point *self = GET_OBJ(_self, struct R_Point);
 	self->y = y;
 }
 
-static void print(struct IPoint *_self)
+static void print(struct Point *_self)
 {
-	struct RPoint *self = (void *)_self - sizeof(struct RPoint);
-	fprintf(stdout, self->cls->prnt, self->x, self->y);
+	struct _Point *self = GET_OBJ(_self, struct R_Point);
+	struct R_Point *r = &self->representation;
+	fprintf(stdout, self->cls->prnt, r->x, r->y);
 }
 
 /*\
@@ -65,7 +66,7 @@ static void print(struct IPoint *_self)
 \*/
 static void *point_ctor(void *_self, va_list *ap)
 {
-	struct Point *self = _self;
+	struct _Point *self = _self;
 
 	self->representation.x = va_arg(*ap, int);
 	self->representation.y = va_arg(*ap, int);
@@ -85,13 +86,13 @@ static void *point_ctor(void *_self, va_list *ap)
 static void *point_dtor(void *_self)
 {	// return original address passed to the ctor
 	// do any other cleanup you might need to do
-	return _self - sizeof(struct RPoint);
+	return GET_OBJ(_self, struct R_Point);
 }
 
 // initialize and declare our class definition
 static struct PointCls _Point = {
 	{
-		sizeof(struct Point),
+		sizeof(struct _Point),
 		point_ctor,
 		point_dtor
 	},

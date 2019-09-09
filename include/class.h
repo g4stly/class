@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
+#define GET_OBJ(i, r_type) (((void *)i - (sizeof(r_type) + sizeof(void *))))
+
 struct cls {
 	size_t size;
 	void * (*ctor)(void *self, va_list *ap);
